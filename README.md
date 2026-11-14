@@ -8,7 +8,7 @@ This project collects every IT job advertised in Melbourne on [Adzuna](https://w
 each one asks for, and turns that into a dashboard: the most requested skills and how their share is changing, weekly
 trends, salary ranges per skill, and where the jobs are.
 
-**Live demo:** https://jobs.imisstech.com.au (going live soon)
+**Live demo:** https://jobs.imisstech.com.au
 
 ![Dashboard showing the most requested skills in Melbourne tech jobs](docs/dashboard.png)
 <sub>Real data, 14 Nov 2026: 2,445 Melbourne IT adverts collected, 1,396 listed in the last 30 days.</sub>
