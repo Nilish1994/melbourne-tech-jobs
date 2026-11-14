@@ -73,7 +73,8 @@ class AdzunaClient:
         category = validate_category(category)
         params = dict(app_id=self.app_id, app_key=self.app_key,
                       where=f"{location}, Victoria, Australia", results_per_page=50,
-                      sort_by="date", sort_dir="down", **{"content-type": "application/json"})
+                      # sort_by=date is already newest-first; Adzuna now rejects sort_dir=down with HTTP 400.
+                      sort_by="date", **{"content-type": "application/json"})
         if max_days_old is not None:
             if not isinstance(max_days_old, int) or max_days_old < 1:
                 raise ValueError("max_days_old must be a positive integer")

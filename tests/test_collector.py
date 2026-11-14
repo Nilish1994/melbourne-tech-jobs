@@ -61,7 +61,7 @@ def test_incremental_query_and_no_local_overlap_discard(conn, raw):
     assert result["newly_inserted_jobs"] == 1
     assert requests[0].url.params["max_days_old"] == "9"
     assert requests[0].url.params["sort_by"] == "date"
-    assert requests[0].url.params["sort_dir"] == "down"
+    assert "sort_dir" not in requests[0].url.params  # rejected by Adzuna (HTTP 400)
     assert "what" not in requests[0].url.params
     assert requests[0].url.params["category"] == "it-jobs"
     assert result["search_category"] == "it-jobs"
