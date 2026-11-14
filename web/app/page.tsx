@@ -63,7 +63,7 @@ export default async function Dashboard() {
         <Card title="What skills pay" subtitle="Advertised annual salary by skill, last 90 days, sorted by median.">
           <SalaryRanges data={salaries} />
         </Card>
-        <Card title="Where the jobs are" subtitle={`Top areas, last ${DAYS} days.`}>
+        <Card title="Where the jobs are" subtitle={`Areas named in adverts, last ${DAYS} days.`}>
           <LocationList data={locations} />
           <Link href="/jobs" className="mt-6 inline-block text-sm text-accent hover:underline">Browse the latest jobs →</Link>
         </Card>

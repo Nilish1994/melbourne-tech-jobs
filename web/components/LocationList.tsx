@@ -3,9 +3,16 @@ import { number } from "@/lib/format";
 import { Empty } from "./Card";
 
 export function LocationList({ data }: { data: Locations }) {
-  if (data.items.length === 0) return <Empty>No locations yet.</Empty>;
+  if (data.items.length === 0) return <Empty>No adverts name a suburb yet.</Empty>;
   const max = Math.max(...data.items.map((item) => item.jobs));
   return (
+    <>
+    {data.unspecified_pct !== null && data.unspecified_pct > 0 && (
+      <p className="mb-3 text-xs text-muted">
+        {data.unspecified_pct}% of adverts only say &ldquo;Melbourne&rdquo;. Shares below are of the{" "}
+        {number(data.specified_jobs)} that name an area.
+      </p>
+    )}
     <ul className="space-y-2">
       {data.items.map((item) => (
         <li key={item.area} className="text-sm">
@@ -19,5 +26,6 @@ export function LocationList({ data }: { data: Locations }) {
         </li>
       ))}
     </ul>
+    </>
   );
 }

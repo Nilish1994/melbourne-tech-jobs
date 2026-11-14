@@ -43,7 +43,13 @@ export type Trend = { skills: string[]; weeks: number; points: TrendPoint[] };
 export type SalaryRow = { skill: string; jobs: number; p25: number | null; median: number | null; p75: number | null };
 export type Salaries = { days: number; overall: SalaryRow | null; items: SalaryRow[]; note: string };
 
-export type Locations = { days: number; total_jobs: number; items: { area: string; jobs: number; share_pct: number }[] };
+export type Locations = {
+  days: number;
+  total_jobs: number;
+  specified_jobs: number;
+  unspecified_pct: number | null;
+  items: { area: string; jobs: number; share_pct: number }[];
+};
 
 export type Job = {
   id: string;

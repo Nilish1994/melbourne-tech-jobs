@@ -78,7 +78,7 @@ docker compose run --rm api python -m app.cli.ingest --incremental      # what t
 docker compose --profile test run --rm tests
 ```
 
-131 tests run against a real PostgreSQL. They cover the Adzuna client (retries, `Retry-After`, quota exhaustion,
+132 tests run against a real PostgreSQL. They cover the Adzuna client (retries, `Retry-After`, quota exhaustion,
 sanitised errors), the collector (locking, recovery, checkpoints, categories), skill extraction (matches and
 false positives), and every analytics endpoint against known data. CI also checks that migrations downgrade and
 upgrade cleanly, lints and type-checks the dashboard, and builds it.

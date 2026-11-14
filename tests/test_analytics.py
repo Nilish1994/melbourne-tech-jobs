@@ -102,6 +102,15 @@ def test_locations(client):
     body = client.get("/analytics/locations?days=30").json()
     assert body["items"][0] == {"area": "Melbourne CBD", "jobs": 3, "share_pct": 75.0}
     assert body["items"][1]["area"] == "Richmond"
+    assert body["unspecified_pct"] == 0
+
+
+def test_locations_counts_bare_melbourne_as_unspecified(client, conn, raw):
+    upsert_jobs(conn, [job(raw, 7, title="Analyst", location="Melbourne, Victoria")])
+    body = client.get("/analytics/locations?days=30").json()
+    assert "Melbourne" not in {item["area"] for item in body["items"]}
+    assert body["total_jobs"] == 5 and body["specified_jobs"] == 4
+    assert body["unspecified_pct"] == 20.0
 
 
 def test_job_list_hides_description_and_filters_by_skill(client):

@@ -18,6 +18,7 @@ from app.skills.extract import skill_group
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
 listed_at = func.coalesce(jobs.c.posted_at, jobs.c.first_seen_at)
+GENERIC_AREA = "Melbourne"  # adverts that name no suburb
 
 # Adzuna salaries are annual AUD. Values outside this band are hourly/daily
 # rates or data errors and would distort medians, so they are left out.
@@ -175,12 +176,19 @@ def salaries(days: int = Query(90, ge=7, le=365), min_jobs: int = Query(5, ge=1,
 @router.get("/locations")
 def locations(days: int = Query(30, ge=1, le=365), limit: int = Query(15, ge=1, le=50),
               conn=Depends(connection)):
-    """Where the jobs are: the first part of Adzuna's location name, e.g. 'Richmond'."""
+    """Where the jobs are: the first part of Adzuna's location name, e.g. 'Richmond'.
+
+    Many adverts give only "Melbourne". Those are counted as unspecified instead
+    of being shown as an area, and shares are of the jobs that name one.
+    """
     area = func.nullif(func.trim(func.split_part(jobs.c.location, ",", 1)), "")
+    named = and_(area.is_not(None), area != GENERIC_AREA)
     total = conn.scalar(select(func.count()).select_from(jobs).where(since(days)))
+    specified = conn.scalar(select(func.count()).select_from(jobs).where(since(days), named))
     rows = conn.execute(select(area.label("area"), func.count().label("jobs"))
-                        .where(since(days), area.is_not(None))
+                        .where(since(days), named)
                         .group_by(area).order_by(func.count().desc(), area).limit(limit)).mappings()
-    return {"days": days, "total_jobs": total,
+    return {"days": days, "total_jobs": total, "specified_jobs": specified,
+            "unspecified_pct": rounded(100 * (total - specified) / total) if total else None,
             "items": [{"area": row["area"], "jobs": row["jobs"],
-                       "share_pct": rounded(100 * row["jobs"] / total) if total else 0} for row in rows]}
+                       "share_pct": rounded(100 * row["jobs"] / specified) if specified else 0} for row in rows]}
