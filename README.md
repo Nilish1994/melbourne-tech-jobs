@@ -10,8 +10,8 @@ trends, salary ranges per skill, and where the jobs are.
 
 **Live demo:** https://jobs.imisstech.com.au (going live soon)
 
-![Dashboard](docs/dashboard-demo.png)
-<sub>Screenshot taken with local demo data (`python -m app.cli.seed_demo`); the live site shows real Adzuna data.</sub>
+![Dashboard showing the most requested skills in Melbourne tech jobs](docs/dashboard.png)
+<sub>Real data, 14 Nov 2026: 2,445 Melbourne IT adverts collected, 1,396 listed in the last 30 days.</sub>
 
 ## How it works
 
