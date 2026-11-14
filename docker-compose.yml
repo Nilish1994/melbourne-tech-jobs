@@ -1,0 +1,77 @@
+name: melbourne-tech-jobs
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks: [database]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+  api:
+    build: .
+    env_file: .env
+    environment:
+      DB_HOST: db
+    # Localhost only, for operators; visitors reach the API through the web app.
+    ports:
+      - "127.0.0.1:8020:8000"
+    networks: [database, app, outbound]
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+  web:
+    build: ./web
+    environment:
+      API_URL: http://api:8000
+    # nginx on the host proxies the public domain to this port.
+    ports:
+      - "127.0.0.1:3020:3000"
+    networks: [app, edge]
+    depends_on: [api]
+    restart: unless-stopped
+  test-db:
+    image: postgres:16
+    profiles: [test]
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: melbourne_jobs_test
+    tmpfs: [/var/lib/postgresql/data]
+    networks: [database]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d melbourne_jobs_test"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+  tests:
+    build: .
+    profiles: [test]
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: melbourne_jobs_test
+      DB_HOST: test-db
+      TEST_DATABASE: "1"
+    networks: [database]
+    depends_on:
+      test-db:
+        condition: service_healthy
+    command: ["sh", "-c", "alembic upgrade head && pytest -q -p no:cacheprovider"]
+networks:
+  database:
+    internal: true
+  app:
+    internal: true
+  outbound: {}
+  edge: {}
+volumes:
+  postgres_data:

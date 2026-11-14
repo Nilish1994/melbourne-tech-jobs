@@ -1,0 +1,17 @@
+[Unit]
+Description=Melbourne Tech Jobs: incremental Adzuna IT-jobs collection
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/srv/projects/melbourne-tech-jobs
+EnvironmentFile=/srv/projects/melbourne-tech-jobs/deploy/collector.env
+ExecStart=/usr/bin/docker compose run --rm --no-deps -T --name melbourne-tech-jobs-collector api python -m app.cli.ingest --incremental --location ${COLLECT_LOCATION} --category ${COLLECT_CATEGORY} --max-pages ${COLLECT_MAX_PAGES} --lookback-days ${COLLECT_LOOKBACK_DAYS} --overlap-days ${COLLECT_OVERLAP_DAYS}
+ExecStopPost=-/usr/bin/docker stop --time 30 melbourne-tech-jobs-collector
+TimeoutStartSec=30min
+TimeoutStopSec=45s
+# A lock conflict is a deliberate skip. Partial/quota/failed runs remain visible.
+SuccessExitStatus=75
+Restart=no

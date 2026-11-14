@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Melbourne Tech Jobs collection
+
+[Timer]
+OnCalendar=*-*-* 03:00:00 Australia/Melbourne
+AccuracySec=1min
+Persistent=true
+Unit=melbourne-tech-jobs-collector.service
+
+[Install]
+WantedBy=timers.target
